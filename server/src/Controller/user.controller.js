@@ -56,11 +56,10 @@ const login = async(req,res) => {
 
     return res
     .status(200)
-    .cookie("token",token)
+    .cookie("token",token,options)
     .json(
       {
-        message : "User Authenticated SuccessFully",
-        user
+        message : "User Authenticated SuccessFully"
       }
     )
   } catch (error) {

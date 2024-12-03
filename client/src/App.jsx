@@ -17,6 +17,7 @@ function App() {
 
     // sent from backend
     socket.on("welcome",(s)=>{
+      alert(`Hello from backend ${s}`)
       console.log(s)
     })
 
