@@ -29,7 +29,9 @@ const server = createServer(app);
 setupSocketIO(server);
 
 import userRouter from "./Route/user.route.js";
-app.use("/user", userRouter);
+import chatRouter from "./Route/chat.route.js";
 
+app.use("/user", userRouter);
+app.use("/chat", chatRouter)
 
 export default server;

@@ -67,7 +67,26 @@ const login = async(req,res) => {
   }
 }
 
+const addFriend = async(req,res) => {
+  const friendId = req.body
+  if(!friendId){
+    return res.status(400).json({message : "Friend Username Required"})
+  }
+  try {
+    const friend = await User.findOne({username : friendId}).select("-__v -password")
+    if(!friend) {
+      return res.status(400).json({message : "Friend with Such Username not found"})
+    } 
+    return res.status(200).json({
+      message : "Friend Fetched SuccessFully",
+      friend
+    })
+  } catch (error) {
+    return res.status(500).json({message : "Internal Server Error in Finding Friend"})
+  }
+} 
 export {
   register,
-  login
+  login,
+  addFriend
 }

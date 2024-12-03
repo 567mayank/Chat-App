@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom'
-import { db } from './Constant';
+import { db } from '../Constant';
 import axios from 'axios'
 
 function Login() {
@@ -30,6 +30,7 @@ function Login() {
       console.error("Error in login of user",error)
     }
   }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">
       <div className="bg-[#fcd4dc] p-8 rounded-lg shadow-lg w-full max-w-sm">

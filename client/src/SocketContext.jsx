@@ -9,6 +9,7 @@ export const SocketProvider = ({ children }) => {
     withCredentials: true 
   }), []);
 
+
   return (
     <SocketContext.Provider value={socket}>
       {children}

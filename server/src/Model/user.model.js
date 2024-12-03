@@ -20,6 +20,18 @@ const userSchema = new Schema({
   password : {
     type : String,
     required : true
+  },
+  avatar : {
+    type : String,
+    default : ""
+  },
+  isActive : {
+    type : Boolean,
+    default : false
+  },
+  socketId : {
+    type : String,
+    default : ""
   }
 })
 

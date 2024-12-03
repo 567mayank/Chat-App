@@ -1,9 +1,9 @@
 import {createBrowserRouter} from 'react-router-dom'
-import App from "./App"
+import App from "./Pages/App"
 import Layout from './Layout'
-import Chat from './Chat'
-import Login from './Login'
-import Register from './Register'
+import Login from './Pages/Login'
+import Register from './Pages/Register'
+import Chat from './Pages/Chat'
 
 const route = createBrowserRouter([
   {
