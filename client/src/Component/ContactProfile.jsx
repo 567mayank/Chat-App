@@ -2,10 +2,12 @@ import React from 'react'
 
 function ContactProfile({
   data=null,
-  handleContactClick
+  handleContactClick,
+  unreadCount = 0,
+  chat
 }) {
   return (
-    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors" onClick={()=>handleContactClick(data)}>
+    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors" onClick={()=>handleContactClick(data,chat._id)}>
       <img
         src={data?.avatar}
         alt="User"
@@ -15,7 +17,11 @@ function ContactProfile({
         <h4 className="font-semibold text-gray-800">{data?.name}</h4>
         <p className="text-gray-600 text-sm">@{data?.username}</p>
       </div>
-      <span className="text-xs text-gray-400">2m ago</span>
+      {unreadCount > 0 && (
+        <div className="bg-pink-500 text-white text-xs rounded-full px-2 py-1">
+          {unreadCount}
+        </div>
+      )}
     </div> 
   )
 }

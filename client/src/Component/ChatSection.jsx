@@ -9,13 +9,15 @@ import Messages from './Messages';
 function ChatSection({
   isOpen,
   setChatSecOpen = false,
-  reciever
+  reciever,
+  setData
 }) {
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState(null);
   const { socket, user } = useSocketUser();
   const chatIdRef = useRef(null);
 
+  // isOpen false 
   useEffect(() => {
     if (isOpen) return;
 
@@ -23,6 +25,32 @@ function ChatSection({
     setMessages(null);
     chatIdRef.current = null;
   }, [isOpen]);
+
+  useEffect(()=>{
+    if(isOpen) return
+    socket.on("msg-backend",(msg) => {
+      addCountWhenChatIsOff(msg)
+    })
+
+    return () => {
+      socket.off("msg-backend");
+    };
+
+  },[isOpen])
+
+  // add count
+  const addCountWhenChatIsOff = (msg) => {
+    setData(prevConversations =>
+      prevConversations.map(conversation =>
+        conversation._id === msg.msg.conversationId
+        ? {
+            ...conversation,
+            unreadCount: (conversation.unreadCount || 0) + 1, // Safely increment unreadCount
+          }
+        : conversation
+      )
+    );
+  }
 
   // fetching messages
   useEffect(() => {

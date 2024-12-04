@@ -19,6 +19,7 @@ function App() {
           }
         );
         setChat(response.data.conversations);
+        console.log(response.data)
       } catch (error) {
         console.error('Error in fetching Chats', error);
       }
@@ -39,7 +40,7 @@ function App() {
           chatSecOpen ? 'hidden' : 'block'
         } lg:block`}
       >
-        <Contact data={chat} setChatSecOpen={setChatSecOpen} setChatUser={setChatUser} />
+        <Contact data={chat} setChatSecOpen={setChatSecOpen} setChatUser={setChatUser} setData={setChat} />
       </div>
 
       <div
@@ -47,7 +48,7 @@ function App() {
           chatSecOpen ? 'block' : 'hidden'
         } lg:block`}
       >
-        <ChatSection setChatSecOpen={setChatSecOpen} isOpen={chatSecOpen} reciever={chatUser} />
+        <ChatSection setChatSecOpen={setChatSecOpen} isOpen={chatSecOpen} reciever={chatUser} setData={setChat} />
       </div>
     </div>
   );

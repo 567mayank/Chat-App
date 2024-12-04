@@ -5,7 +5,8 @@ import { useSocketUser } from '../SocketContext';
 function Contact({
   data=null,
   setChatSecOpen,
-  setChatUser
+  setChatUser,
+  setData
 }) {
   const [dialog,setDialog] = useState(false)
   const {user} = useSocketUser()
@@ -17,10 +18,16 @@ function Contact({
 
   }
 
-  const handleContactClick = (contact) => {
-    // console.log(contact)
+  const handleContactClick = (contact,chatId) => {
     setChatSecOpen(true)
     setChatUser(contact)
+    setData(prevConversations =>
+      prevConversations.map(conversation =>
+        conversation._id === chatId
+          ? { ...conversation, unreadCount: 0 } 
+          : conversation 
+      )
+    );
   }
 
   return (
@@ -62,7 +69,7 @@ function Contact({
         <div className="space-y-3">
           {
             data && data.map((chat,index) => (
-              <ContactProfile key={index} data={chat.participants[0]} handleContactClick={handleContactClick} />
+              <ContactProfile key={index} data={chat.participants[0]} chat={chat} unreadCount={chat?.unreadCount} handleContactClick={handleContactClick} />
             ))
           }
         </div>

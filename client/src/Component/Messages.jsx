@@ -34,9 +34,9 @@ const ChatMessages = ({ messages, user }) => {
         messages.map((msg, index) => (
           <div key={index}>
             {index === insertIndex && (
-              <div class="flex justify-center my-4" ref={messagesEndRef}>
-                <div class="px-4 py-2 bg-gray-100 rounded-full shadow-md inline-block">
-                  <span class="text-xs text-gray-600">Unread Messages</span>
+              <div className="flex justify-center my-4" ref={messagesEndRef}>
+                <div className="px-4 py-2 bg-gray-100 rounded-full shadow-md inline-block">
+                  <span className="text-xs text-gray-600">Unread Messages</span>
                 </div>
               </div>
             )}
@@ -45,7 +45,7 @@ const ChatMessages = ({ messages, user }) => {
               {/* message */}
               <div
                 className={`px-4 py-2 min-w-24 max-w-xs lg:max-w-md flex flex-col rounded-lg ${
-                  msg.sender === user?._id ? 'bg-[#25D366] text-white items-end' : 'bg-gray-300 text-gray-800'
+                  msg.sender === user?._id ? 'bg-[#e782b5] text-white items-end' : 'bg-gray-300 text-gray-800'
                 }`}
               >
                 {msg.msg}

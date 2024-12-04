@@ -2,30 +2,52 @@ import Message from '../Model/message.model.js'
 import Chat from '../Model/chat.model.js'
 import User from '../Model/user.model.js'
 
-const userAllChats = async(req,res) => {
-  const userId = req?.user?._id
-  if(!userId) {
-    return res.status(400).json({Message : "Unauthorized Access"})
+const userAllChats = async (req, res) => {
+  const userId = req?.user?._id;
+
+  if (!userId) {
+    return res.status(400).json({ Message: "Unauthorized Access" });
   }
+
   try {
     const conversations = await Chat.find({
       participants: userId,
-    }).select("-createdAt -messages -__v").populate("participants","-password -__v -socketId"); 
+    })
+      .select("-createdAt -messages -__v")
+      .populate("participants", "-password -__v -socketId");
 
+    // Remove  user from  participants list
     conversations.forEach((conversation) => {
       conversation.participants = conversation.participants.filter(
         (participant) => participant._id.toString() !== userId.toString()
       );
     });
 
+    const conversationsWithUnreadCount = await Promise.all(
+      conversations.map(async (conversation) => {
+
+        const unreadCount = await Message.countDocuments({
+          conversationId: conversation._id,
+          reciever: userId,
+          status: "Sent",
+        });
+
+        return {
+          ...conversation.toObject(), 
+          unreadCount,  
+        };
+      })
+    );
+
     return res.status(200).json({
-      Message : "All Chat Fetched Successfully",
-      conversations
-    })
+      Message: "All Chats Fetched Successfully",
+      conversations: conversationsWithUnreadCount,
+    });
   } catch (error) {
-    return res.status(500).json({Message : "Internal Server error in Fetching all Chats"})
+    console.error(error);  
+    return res.status(500).json({ Message: "Internal Server Error in Fetching all Chats" });
   }
-}
+};
 
 const addfriend = async(req,res) => {
   const userId = req?.user?._id
