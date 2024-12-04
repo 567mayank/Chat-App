@@ -53,12 +53,13 @@ function ChatSection({
     retrieveMsg();
   }, [isOpen, reciever, socket]);
   
+  // intiating socket
   const startSocket = () => {
     if (!isOpen || !chatIdRef.current) return;
 
     const handleNewMessage = ({ msg, msgId }) => {
       if (!isOpen) return;
-
+      msg.status = "Read"
       if (msg.conversationId === chatIdRef.current) {
         setMessages((prevMessages) => [...prevMessages, msg]);
         readMsg(msgId);
