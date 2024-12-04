@@ -24,7 +24,6 @@ const CenterForm = ({
         {username},
         {withCredentials : true}
       )
-      console.log(response.data)
       alert("Friend Added Successfully")
       setDialog(false)
       window.location.reload();

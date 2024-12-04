@@ -41,14 +41,14 @@ const addfriend = async(req,res) => {
   }
 
   try {
-    const receiver = await User.findOne({username:username}).select("-__v -password")
+    const reciever = await User.findOne({username:username}).select("-__v -password")
 
-    if(!receiver) {
+    if(!reciever) {
       return res.status(400).json({Message : "User with this username does not exist"})
     }
 
     const prevChat = await Chat.findOne({
-      participants: { $all: [userId, receiver._id] },  
+      participants: { $all: [userId, reciever._id] },  
       participants: { $size: 2 } 
     });
 
@@ -60,7 +60,7 @@ const addfriend = async(req,res) => {
 
     const chat = await Chat.create(
       {
-        participants : [userId,receiver._id]
+        participants : [userId,reciever._id]
       }
     )
 
@@ -68,7 +68,7 @@ const addfriend = async(req,res) => {
       {
         Message : "Friend Added Successfully",
         chat,
-        receiver
+        reciever
       }
     )
   } catch (error) {
@@ -76,7 +76,38 @@ const addfriend = async(req,res) => {
   }
 }
 
+const getAllMsg = async(req,res) => {
+  const userId = req?.user?._id
+  if(!userId) {
+    return res.status(400).json({Message : "Unathorized Access"})
+  }
+  const friendId = req.params?.friendId
+  if(!friendId) {
+    return res.status(400).json({Message : "Friend Id not provided"})
+  }
+  try {
+    const chat = await Chat.findOne(
+      {
+        participants: { $all: [userId, friendId] },
+      }
+    ).select("-__v -createdAt -updatedAt -participants").populate("messages")
+
+    return res.status(200).json({
+      Message : "User-Friend Message Fetched Successfully",
+      chat
+    })
+    
+  } catch (error) {
+    res.status(500).json({Message :"Error in finding Messages specific to friend" })
+  }
+}
+
+// const addMsg = async(req,res) => {
+
+// }
+
 export {
   userAllChats,
-  addfriend
+  addfriend,
+  getAllMsg
 }

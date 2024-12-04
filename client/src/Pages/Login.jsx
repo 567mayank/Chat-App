@@ -25,6 +25,13 @@ function Login() {
           withCredentials : true
         }
       )
+
+      const userInfo = await axios.get(
+        `${db}/user/getUserInfo/${username}`,
+        {withCredentials : true}
+      )
+      console.log(userInfo.data)
+      localStorage.setItem("user",JSON.stringify(userInfo.data.user))
       navigate("/chat")
     } catch (error) { 
       console.error("Error in login of user",error)

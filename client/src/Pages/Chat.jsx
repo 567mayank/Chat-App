@@ -27,6 +27,10 @@ function App() {
     retrieveData();
   }, []);
 
+  useEffect(()=>{
+    if(!chatSecOpen) setChatUser(null)
+  },[chatSecOpen])
+
   return (
     <div className='min-h-screen min-w-full flex'>
       {/* Conditional rendering for contact list */}

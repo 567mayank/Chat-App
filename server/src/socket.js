@@ -1,7 +1,32 @@
-// socket.js
 import { Server } from "socket.io";
+import User from "./Model/user.model.js";
+import Message from "./Model/message.model.js";
+import Chat from "./Model/chat.model.js";
+// import Chat from '../Model/chat/'
 
-// Define a function to setup the Socket.IO server
+
+const messageSaver = async(msg) => {
+  try {
+    const dbMsg = await Message.create(
+      {
+        msg : msg.msg,
+        sender : msg.sender,
+        reciever : msg.reciever,
+        conversationId : msg.conversationId
+      }
+    ) 
+    await Chat.findByIdAndUpdate(
+      msg.conversationId,
+      {
+        $push: { messages: dbMsg }
+      }
+    )
+
+  } catch (error) {
+    console.error("Error in Updating message in database",error)
+  }
+}
+
 export default function setupSocketIO(server) {
   const io = new Server(server, {
     cors: {
@@ -11,26 +36,62 @@ export default function setupSocketIO(server) {
     },
   });
 
-  // Socket.IO connection handling
   io.on("connection", (socket) => {
     console.log(`User connected with ID: ${socket.id}`);
+    
+    socket.on("msg",async (msg) => {
 
-    // // Send a message to the client
-    // socket.emit("welcome", `Welcome to the server!`);
+      if(!msg.reciever) {
+        socket.to(socket.id).emit("error","Reciever Id not Provided")
+        console.error("Reciever Id not Provided")
+        return
+      }
 
-    // // Example of room-based messaging
-    // socket.on("joinRoom", (room) => {
-    //   socket.join(room);
-    //   console.log(`User ${socket.id} joined room: ${room}`);
-    // });
+      const recieverData = await User.findById(msg.reciever)
 
-    // socket.on("message", (message, room) => {
-    //   // Send message to a specific room
-    //   io.to(room).emit("received-message", message);
-    // });
+      if(!recieverData){
+        socket.to(socket.id).emit("error","Reciever Not Found")
+        console.error("Reciever Not Found")
+        return
+      }
 
-    // Handle disconnection
-    socket.on("disconnect", () => {
+      messageSaver(msg)
+
+      if(!recieverData.isActive){
+        socket.to(socket.id).emit("error","Reciever is Not Active")
+        console.error("Reciever is not Active")
+        return
+      }
+
+      socket.to(recieverData.socketId).emit("msg-backend",msg)
+       
+      console.log("message sent")
+      
+    })
+    
+    
+    socket.on("disconnect", async() => {
+      try {
+        const user = await User.findOneAndUpdate(
+          { socketId: socket.id },
+          { socketId: null, isActive: false }, 
+          { new: true } 
+        );
+    
+        if (user) {
+          console.log(`User disconnected: ${socket.id}`);
+        } else {
+          console.log(`No user found with socketId: ${socket.id}`);
+        }
+
+      } catch (error) {
+        if (error.code === 'ECONNRESET') {
+          console.error('Connection was reset by the client:', error);
+        } else {
+          console.error('Error in removing socketId:', error);
+        }
+      }
+
       console.log(`User disconnected: ${socket.id}`);
     });
   });

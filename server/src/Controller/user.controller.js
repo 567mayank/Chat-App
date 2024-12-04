@@ -67,6 +67,22 @@ const login = async(req,res) => {
   }
 }
 
+const getUser = async(req,res) => {
+  const {username} = req?.params
+  if(!username){
+    return res.status(400).json({message : "Username not provided"}) 
+  }
+  try {
+    const user = await User.findOne({username}).select("-password -socketId -isActive -__v")
+    return res.status(200).json({
+      message : "User Info Fetched Successfully",
+      user
+    })
+  } catch (error) {
+    return res.status(500).json({message : "Error in fetching user info"}) 
+  }
+}
+
 const addFriend = async(req,res) => {
   const friendId = req.body
   if(!friendId){
@@ -85,8 +101,55 @@ const addFriend = async(req,res) => {
     return res.status(500).json({message : "Internal Server Error in Finding Friend"})
   }
 } 
+
+const updateSocketId = async(req,res) => {
+  const userId = req?.user?._id
+  if(!userId){
+    return res.status(400).json({message : "Unathorised Access"})
+  }
+  const {socketId} = req?.body 
+  if(!socketId){
+    return res.status(400).json({message : "SocketId not provided"})
+  }
+  try {
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        socketId,
+        isActive : true
+      }
+    )
+    return res.status(200).json({message : "SocketId Updated Successfully"})
+  } catch (error) {
+    return res.status(500).json({message : "Internal Server Error in Updating SocketId"})
+  }
+}
+
+const removeSocketId = async(req,res) => {
+  console.log("success")
+  const userId = req?.user?._id
+  if(!userId){
+    return res.status(400).json({message : "Unathorised Access"})
+  }
+  try {
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        socketId : null,
+        isActive : false
+      }
+    )
+    return res.status(200).json({message : "SocketId Removed Successfully"})
+  } catch (error) {
+    return res.status(500).json({message : "Internal Server Error in Removing SocketId"})
+  }
+}
+
 export {
   register,
   login,
-  addFriend
+  getUser,
+  addFriend,
+  updateSocketId,
+  removeSocketId
 }

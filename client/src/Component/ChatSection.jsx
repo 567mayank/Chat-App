@@ -1,28 +1,60 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import { FaArrowLeft } from "react-icons/fa";
+import { db } from '../Constant';
+import { useSocketUser } from '../SocketContext'
 
 function ChatSection({
   isOpen,
   setChatSecOpen = false,
   reciever
 }) {
-  const [messageInput, setMessageInput] = useState('');
-  const [messages, setMessages] = useState([
-    { text: 'Hey, how are you?', sender: 'user' },
-    { text: 'I am good, thanks!', sender: 'other' },
-  ]);
 
+  const [messageInput, setMessageInput] = useState('');
+  const [messages, setMessages] = useState(null);
+  // const socket = useSocket()
+  const { socket, user, setUser } = useSocketUser();
+  const [chatId,setChatId] = useState(null)
+
+  useEffect(()=>{
+    const retriveMsg = async() => {
+      try {
+        const response = await axios.get(
+          `${db}/chat/getAllMsg/${reciever._id}`,
+          {withCredentials : true}
+        )
+        setMessages(response.data.chat.messages)
+        setChatId(response.data.chat._id)
+        console.log(response.data.chat)
+      } catch (error) {
+        console.error("error in fetching messages",error)
+      }
+    }
+    if(isOpen) retriveMsg()
+    else setMessages(null) 
+  },[isOpen,setChatSecOpen,reciever])
+
+  useEffect(()=>{
+    socket.on("msg-backend",(msg)=>{
+      setMessages(prevMessages => [...prevMessages, msg]);
+    })
+  },[])
+  
   const handleSendMessage = (e) => {
     e.preventDefault()
-    if (messageInput.trim()) {
-      setMessages([...messages, { text: messageInput, sender: 'user' }]);
-      setMessageInput('');
-    }
+    console.log("message sent")
+    const msg = {
+      msg : messageInput,
+      sender : user._id,
+      reciever : reciever._id,
+      conversationId : chatId
+    } 
+    socket.emit("msg",msg)
+    setMessages(prevMessages => [...prevMessages, msg]);
+    setMessageInput('');
   };
-
-  console.log(reciever)
-
+  
   return (
     
     <div>
@@ -44,19 +76,19 @@ function ChatSection({
       
             {/* Main Part - Chat Messages */}
             <div className="flex-1 overflow-auto p-4 space-y-4">
-              {messages.map((msg, index) => (
+              {messages && messages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${msg.sender === user?._id ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`px-4 py-2 max-w-xs rounded-lg ${
-                      msg.sender === 'user'
+                      msg.sender === user?._id
                         ? 'bg-[#25D366] text-white'
                         : 'bg-gray-300 text-gray-800'
                     }`}
                   >
-                    {msg.text}
+                    {msg.msg}
                   </div>
                 </div>
               ))}
@@ -78,7 +110,6 @@ function ChatSection({
                 <FaPaperPlane /> 
               </button>
             </form>
-
           </div>
 
         ):(

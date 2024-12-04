@@ -10,7 +10,7 @@ const msgSchema = new Schema({
     ref : "User",
     required : true
   },
-  receiver : {
+  reciever : {
     type : Schema.Types.ObjectId,
     ref : "User",
     required : true
@@ -27,7 +27,7 @@ const msgSchema = new Schema({
   },
 },{timestamps : true})
 
-msgSchema.index({ sender: 1, receiver: 1 });
+msgSchema.index({ sender: 1, reciever: 1 });
 msgSchema.index({ conversationId: 1 });
 
 const Message = mongoose.model("Message",msgSchema)

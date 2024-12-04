@@ -16,7 +16,7 @@ function Contact({
   }
 
   const handleContactClick = (contact) => {
-    console.log(contact)
+    // console.log(contact)
     setChatSecOpen(true)
     setChatUser(contact)
   }
