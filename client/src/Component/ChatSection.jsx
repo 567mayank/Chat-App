@@ -4,6 +4,7 @@ import { FaPaperPlane } from 'react-icons/fa';
 import { FaArrowLeft } from "react-icons/fa";
 import { db } from '../Constant';
 import { useSocketUser } from '../SocketContext'
+import Messages from './Messages';
 
 function ChatSection({
   isOpen,
@@ -13,7 +14,6 @@ function ChatSection({
 
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState(null);
-  // const socket = useSocket()
   const { socket, user, setUser } = useSocketUser();
   const [chatId,setChatId] = useState(null)
 
@@ -48,7 +48,8 @@ function ChatSection({
       msg : messageInput,
       sender : user._id,
       reciever : reciever._id,
-      conversationId : chatId
+      conversationId : chatId,
+      createdAt : new Date()
     } 
     socket.emit("msg",msg)
     setMessages(prevMessages => [...prevMessages, msg]);
@@ -75,24 +76,8 @@ function ChatSection({
             </div>
       
             {/* Main Part - Chat Messages */}
-            <div className="flex-1 overflow-auto p-4 space-y-4">
-              {messages && messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.sender === user?._id ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`px-4 py-2 max-w-xs rounded-lg ${
-                      msg.sender === user?._id
-                        ? 'bg-[#25D366] text-white'
-                        : 'bg-gray-300 text-gray-800'
-                    }`}
-                  >
-                    {msg.msg}
-                  </div>
-                </div>
-              ))}
-            </div>
+
+            <Messages messages={messages} user={user}/>
       
             {/* Input Field for Sending Message */}
             <form onSubmit={handleSendMessage} className="bg-[#1A1A1D] p-4 flex items-center space-x-3 border-t border-zinc-600">

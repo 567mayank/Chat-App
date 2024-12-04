@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import UsernameAsk from "../Component/UsernameAsk"
 import ContactProfile from './ContactProfile';
+import { useSocketUser } from '../SocketContext';
 function Contact({
   data=null,
   setChatSecOpen,
   setChatUser
 }) {
   const [dialog,setDialog] = useState(false)
+  const {user} = useSocketUser()
   const handleNewChat = () => {
     setDialog(true)
   }
@@ -27,11 +29,11 @@ function Contact({
       <div className="bg-[#1A1A1D] p-4 flex items-center justify-between text-white">
         <div className="flex items-center space-x-2">
           <img
-            src="https://via.placeholder.com/40"
+            src={user?.avatar}
             alt="UserName"
             className="rounded-full w-10 h-10 object-cover"
           />
-          <h3 className="text-lg font-semibold">UserName</h3>
+          <h3 className="text-lg font-semibold">{user?.name}</h3>
         </div>
         <button className="bg-[#48222e] px-4 py-2 rounded-full hover:bg-[#128C7E] transition-colors">
           <i className="fas fa-phone"></i>
