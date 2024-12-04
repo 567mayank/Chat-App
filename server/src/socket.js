@@ -18,12 +18,13 @@ const messageSaver = async(msg) => {
     await Chat.findByIdAndUpdate(
       msg.conversationId,
       {
-        $push: { messages: dbMsg }
+        $push: { messages: dbMsg._id }
       }
     )
-
+    return dbMsg._id
   } catch (error) {
     console.error("Error in Updating message in database",error)
+    return null
   }
 }
 
@@ -55,15 +56,14 @@ export default function setupSocketIO(server) {
         return
       }
 
-      messageSaver(msg)
+      const msgId = await messageSaver(msg)
 
       if(!recieverData.isActive){
         socket.to(socket.id).emit("error","Reciever is Not Active")
         console.error("Reciever is not Active")
         return
       }
-
-      socket.to(recieverData.socketId).emit("msg-backend",msg)
+      socket.to(recieverData.socketId).emit("msg-backend",{msg,msgId})
        
       console.log("message sent")
       
