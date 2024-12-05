@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router-dom'
 import UsernameAsk from "../Component/UsernameAsk"
 import ContactProfile from './ContactProfile';
 import { useSocketUser } from '../SocketContext';
+import { IoLogOut } from "react-icons/io5";
+import axios from 'axios';
+import { db } from '../Constant';
+
 function Contact({
   data=null,
   setChatSecOpen,
   setChatUser,
   setData
 }) {
+  const navigate = useNavigate()
   const [dialog,setDialog] = useState(false)
   const {user} = useSocketUser()
   const handleNewChat = () => {
@@ -30,20 +36,37 @@ function Contact({
     );
   }
 
+  const handleLogout = async() => {
+    localStorage.clear()
+    try {
+      const response = await axios.post(
+        `${db}/user/logout`,
+        {},
+        {withCredentials : true}
+      ) 
+      navigate('/')
+    } catch (error) {
+      console.error("Error in logging out user",error)
+    }
+  }
+
   return (
     <div className="h-screen bg-[#3B1C32]">
       {/* Header */}
       <div className="bg-[#1A1A1D] p-4 flex items-center justify-between text-white">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-x-2 space-x-2">
           <img
             src={user?.avatar}
             alt="UserName"
             className="rounded-full w-10 h-10 object-cover"
           />
-          <h3 className="text-lg font-semibold">{user?.name}</h3>
+          <div>
+            <h3 className="text-lg font-semibold">{user?.name}</h3>
+            <h3 className="text-xs text-gray-200 font-semibold">@{user?.username}</h3>
+          </div>
         </div>
-        <button className="bg-[#48222e] px-4 py-2 rounded-full hover:bg-[#128C7E] transition-colors">
-          <i className="fas fa-phone"></i>
+        <button className=" px-4 py-2 rounded-full hover:bg-[#f089b6] transition-colors" onClick={handleLogout}>
+          <IoLogOut size={25} />
         </button>
       </div>
 

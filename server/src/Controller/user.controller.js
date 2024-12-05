@@ -159,11 +159,39 @@ const removeSocketId = async(req,res) => {
   }
 }
 
+const logout = async(req,res) => {
+  const userId = req?.user?._id
+  if(!userId){
+    return res.status(400).json({message : "Unauthorised Access"})
+  }
+  try {
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $set : {
+          socketId : null,
+          isActive : false
+        }
+      }
+    )
+    return res
+      .status(200)
+      .clearCookie("token")
+      .json({
+        message : "User Logged Out Successfully"
+      })
+  } catch (error) {
+    console.error("error in logging out user",error)
+    return res.status(500).json({message : "Internal Server Error in Logging out User"})
+  }
+}
+
 export {
   register,
   login,
   getUser,
   addFriend,
   updateSocketId,
-  removeSocketId
+  removeSocketId,
+  logout
 }

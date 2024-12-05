@@ -69,11 +69,13 @@ const addfriend = async(req,res) => {
       return res.status(400).json({Message : "User with this username does not exist"})
     }
 
+    console.log(userId,reciever._id)
     const prevChat = await Chat.findOne({
-      participants: { $all: [userId, reciever._id] },  
-      participants: { $size: 2 } 
+      participants: { $all: [userId, reciever._id], $size: 2 }
     });
+    
 
+    console.log(prevChat)
     
 
     if(prevChat) {
