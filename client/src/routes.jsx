@@ -12,7 +12,7 @@ const route = createBrowserRouter([
     children:[
       {
         path : "/",
-        element:<App/>
+        element:<Login/>
       },
       {
         path : "/chat",

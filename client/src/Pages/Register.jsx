@@ -8,39 +8,47 @@ function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");  
-  const [confirmPassword, setConfirmPassword] = useState("");  
-  const navigate = useNavigate()
+  const [profilePic, setProfilePic] = useState(null);  // State to hold the profile picture
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !username || !password || !confirmPassword) {
-      alert("All Fields Required")
+    if (!name || !email || !username || !password) {
+      alert("All Fields Required");
       return;
     }
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("avatar", profilePic);  
 
     try {
       const response = await axios.post(
         `${db}/user/register`,
+        formData,
         {
-          name,
-          username,
-          email,
-          password  
-        },
-        {
-          withCredentials: true
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data',  
+          },
         }
       );
 
       console.log(response.data);
-      navigate("/login")
+      navigate("/login");
     } catch (error) {
       console.error("Error in registering user", error);
+    }
+  };
+
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePic(file); 
     }
   };
 
@@ -105,16 +113,15 @@ function Register() {
             />
           </div>
 
-          {/* Confirm Password Input */}
+          {/* Profile Picture Input */}
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <label htmlFor="profilePic" className="block text-sm font-medium text-gray-700">Profile Picture</label>
             <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
+              type="file"
+              id="profilePic"
+              onChange={handleProfilePicChange}
               className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              accept="image/*"
               required
             />
           </div>

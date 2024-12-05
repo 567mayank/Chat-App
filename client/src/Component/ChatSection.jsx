@@ -45,7 +45,7 @@ function ChatSection({
         conversation._id === msg.msg.conversationId
         ? {
             ...conversation,
-            unreadCount: (conversation.unreadCount || 0) + 1, // Safely increment unreadCount
+            unreadCount: (conversation.unreadCount || 0) + 1,
           }
         : conversation
       )

@@ -1,4 +1,5 @@
 import User from "../Model/user.model.js"
+import {uploadOnCloudinary} from '../utils/cloudinary.js'
 
 const register = async(req,res) => {
   const {name,username,email,password} = req.body
@@ -14,12 +15,24 @@ const register = async(req,res) => {
     if(existingUser) {
       return res.status(400).json({message : "Email/Username Already Taken"})
     }
+
+    let avatarUrl = null;
+
+    if (req.file) {
+      avatarUrl = await uploadOnCloudinary(req.file.path); 
+    }
+
+    if(!avatarUrl) {
+      return res.status(400).json({message : "File Not Uploaded"})
+    }
+
     const user = await User.create(
       {
         name,
         email,
         username,
-        password
+        password,
+        avatar : avatarUrl.url
       }
     )
     return res.status(200).json(
@@ -29,6 +42,7 @@ const register = async(req,res) => {
       }
     )
   } catch (error) {
+    console.error("error in registering user",error)
     return res.status(500).json({message : "Internal Server Error in Registering User"})
   }
 }
