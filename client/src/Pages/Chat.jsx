@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Contact from '../Component/Contact';
 import ChatSection from '../Component/ChatSection';
-import { db } from '../Constant';
+import { db, isLoggedIn } from '../Constant';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
+  const navigate = useNavigate() 
   const [chatSecOpen, setChatSecOpen] = useState(false);
   const [chatUser, setChatUser] = useState(null);
   const [chat, setChat] = useState(null);
 
   useEffect(() => {
+    if(!isLoggedIn()) return
     const retrieveData = async () => {
       try {
         const response = await axios.get(
@@ -31,6 +34,13 @@ function App() {
   useEffect(()=>{
     if(!chatSecOpen) setChatUser(null)
   },[chatSecOpen])
+
+  useEffect(()=>{
+    if(!isLoggedIn()) {
+      navigate("/")
+      return
+    }
+  },[isLoggedIn])
 
   return (
     <div className='min-h-screen min-w-full flex'>

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
-import { db } from "./Constant";
+import { db, isLoggedIn } from "./Constant";
 
 const SocketContext = createContext(null);
 
@@ -14,62 +14,55 @@ export const SocketProvider = ({ children }) => {
 
   const [user,setUser] = useState(null)
 
+  const connectSocket = () => {
+    
+  }
+
   useEffect(() => {
+    if(!isLoggedIn()) return
     socket.on("connect", async() => {
+      console.log("connect")
       try {
-        await axios.put(
+        const response = await axios.put(
           `${db}/user/updateSocketId`,
           {socketId : socket.id},
           {withCredentials : true}
         )
+        console.log(response.data)
       } catch (error) {
         console.error("error in updating socketId",error)
       }
       
     });
 
-    // On disconnection, notify backend to remove socketId
-    // socket.on("disconnect", async() => {
-    //   try {
-    //     const response = await axios.put(
-    //       `${db}/user/removeSocketId`,
-    //       {socketId : socket.id},
-    //       {withCredentials : true}
-    //     )
-    //     console.log(response.data)
-    //   } catch (error) {
-    //     console.error("error in removing socketId",error)
-    //   }
-    // });
-
     // Cleanup when the component is unmounted
     return () => {
       socket.off("connect");
       socket.off("disconnect");
     };
-  }, [socket]);
+  }, [socket,isLoggedIn,user]);
 
   useEffect(()=>{
-    const local = localStorage.getItem("user")
+    const local = sessionStorage.getItem("user")
     if(local) {
-      setUser(JSON.parse(local))
+      checkUser(JSON.parse(local))
     }
   },[])
 
+  const checkUser = async(username) => {
+    const userInfo = await axios.get(
+      `${db}/user/getUserInfo/${username}`,
+      {withCredentials : true}
+    )
+    setUser(userInfo.data.user)
+  }
+
   return (
-    <SocketContext.Provider value={{socket,user}}>
+    <SocketContext.Provider value={{socket,user,setUser}}>
       {children}
     </SocketContext.Provider>
   );
 };
-
-// export const useSocket = () => {
-//   const {socket} = useContext(SocketContext);
-//   if (!socket) {
-//     throw new Error("useSocket must be used within a SocketProvider");
-//   }
-//   return socket;
-// };
 
 export const useSocketUser = () => {
   const context = useContext(SocketContext);

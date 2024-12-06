@@ -37,7 +37,7 @@ function Contact({
   }
 
   const handleLogout = async() => {
-    localStorage.clear()
+    sessionStorage.clear()
     try {
       const response = await axios.post(
         `${db}/user/logout`,

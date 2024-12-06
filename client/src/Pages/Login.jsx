@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom'
-import { db } from '../Constant';
+import { db, isLoggedIn } from '../Constant';
 import axios from 'axios'
+import { useSocketUser } from '../SocketContext';
 
 function Login() {
   const [username,setUsername] = useState("")
   const [password,setPassword] = useState("")
   const navigate = useNavigate()
+  const {setUser} = useSocketUser()
 
   const handleSubmit = async(e) => {
     e.preventDefault()
@@ -31,12 +33,20 @@ function Login() {
         {withCredentials : true}
       )
       console.log(userInfo.data)
-      localStorage.setItem("user",JSON.stringify(userInfo.data.user))
+      setUser(userInfo.data.user)
+      sessionStorage.setItem("user",JSON.stringify(username))
+      window.location.reload();
       navigate("/chat")
     } catch (error) { 
       console.error("Error in login of user",error)
     }
   }
+
+  useEffect(()=>{
+    if(isLoggedIn()) {
+      navigate("/chat")
+    }
+  },[isLoggedIn])
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">

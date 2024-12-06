@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { db } from '../Constant';
@@ -51,6 +51,12 @@ function Register() {
       setProfilePic(file); 
     }
   };
+
+  useEffect(()=>{
+    if(isLoggedIn()) {
+      navigate("/chat")
+    }
+  },[isLoggedIn])
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">

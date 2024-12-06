@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import { FaArrowLeft } from "react-icons/fa";
-import { db } from '../Constant';
+import { db, isLoggedIn } from '../Constant';
 import { useSocketUser } from '../SocketContext';
 import Messages from './Messages';
 
@@ -27,7 +27,7 @@ function ChatSection({
   }, [isOpen]);
 
   useEffect(()=>{
-    if(isOpen) return
+    if(isOpen ) return
     socket.on("msg-backend",(msg) => {
       addCountWhenChatIsOff(msg)
     })
