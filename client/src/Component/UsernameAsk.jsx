@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai"; // Import the close icon
 import { db } from "../Constant";
+import Loading from "./Loading";
 
 const CenterForm = ({
   message = "",
@@ -9,6 +10,7 @@ const CenterForm = ({
 }) => {
 
   const [username, setUsername] = useState("");
+  const [isLoading,setIsLoading] = useState(false)
 
   // Handle form submission
   const handleSubmit = async(e) => {
@@ -19,11 +21,13 @@ const CenterForm = ({
     }
 
     try {
+      setIsLoading(true)
       const response = await axios.post(
         `${db}/chat/addFriend`,
         {username},
         {withCredentials : true}
       )
+      setIsLoading(false)
       alert("Friend Added Successfully")
       setDialog(false)
       window.location.reload();
@@ -37,6 +41,7 @@ const CenterForm = ({
 
   return (
     <>
+      {isLoading && <Loading/>}
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
         <div className="bg-[#14131d] p-8 rounded-lg shadow-lg w-96 text-center text-white border border-zinc-400 relative">
           <button

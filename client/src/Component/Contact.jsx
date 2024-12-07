@@ -6,6 +6,7 @@ import { useSocketUser } from '../SocketContext';
 import { IoLogOut } from "react-icons/io5";
 import axios from 'axios';
 import { db } from '../Constant';
+import Loading from './Loading';
 
 function Contact({
   data=null,
@@ -16,6 +17,7 @@ function Contact({
   const navigate = useNavigate()
   const [dialog,setDialog] = useState(false)
   const {user} = useSocketUser()
+  const [isLoading,setIsLoading] = useState(false)
   const handleNewChat = () => {
     setDialog(true)
   }
@@ -39,6 +41,7 @@ function Contact({
   const handleLogout = async() => {
     sessionStorage.clear()
     try {
+      setIsLoading(true)
       const response = await axios.post(
         `${db}/user/logout`,
         {},
@@ -47,12 +50,15 @@ function Contact({
       navigate('/')
     } catch (error) {
       console.error("Error in logging out user",error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <div className="h-screen bg-[#3B1C32]">
       {/* Header */}
+      {isLoading && <Loading/>}
       <div className="bg-[#1A1A1D] p-4 flex items-center justify-between text-white">
         <div className="flex items-center gap-x-2 space-x-2">
           <img

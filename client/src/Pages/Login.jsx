@@ -3,12 +3,14 @@ import {Link, useNavigate} from 'react-router-dom'
 import { db, isLoggedIn } from '../Constant';
 import axios from 'axios'
 import { useSocketUser } from '../SocketContext';
+import Loading from '../Component/Loading';
 
 function Login() {
   const [username,setUsername] = useState("")
   const [password,setPassword] = useState("")
   const navigate = useNavigate()
   const {setUser} = useSocketUser()
+  const [isLoading,setIsLoading] = useState(false)
 
   const handleSubmit = async(e) => {
     e.preventDefault()
@@ -17,6 +19,7 @@ function Login() {
       return 
     }
     try {
+      setIsLoading(true)
       const response = await axios.post(
         `${db}/user/login`,
         {
@@ -38,7 +41,10 @@ function Login() {
       window.location.reload();
       navigate("/chat")
     } catch (error) { 
+      alert(error.response.data.message)
       console.error("Error in login of user",error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -50,6 +56,7 @@ function Login() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">
+      {isLoading && <Loading/>}
       <div className="bg-[#fcd4dc] p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Login</h2>
         <form onSubmit={handleSubmit}>

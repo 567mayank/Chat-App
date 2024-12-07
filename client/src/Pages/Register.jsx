@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { db, isLoggedIn } from '../Constant';
+import Loading from '../Component/Loading';
 
 function Register() {
+  
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");  
-  const [profilePic, setProfilePic] = useState(null);  // State to hold the profile picture
+  const [profilePic, setProfilePic] = useState(null);  
+  const [isLoading,setIsLoading] = useState(false)
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -27,6 +30,7 @@ function Register() {
     formData.append("avatar", profilePic);  
 
     try {
+      setIsLoading(true)
       const response = await axios.post(
         `${db}/user/register`,
         formData,
@@ -38,10 +42,11 @@ function Register() {
         }
       );
 
-      console.log(response.data);
       navigate("/login");
     } catch (error) {
       console.error("Error in registering user", error);
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -60,6 +65,7 @@ function Register() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">
+      {isLoading && <Loading/>}
       <div className="bg-[#fcd4dc] p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Create Account</h2>
         <form onSubmit={handleSubmit}>
