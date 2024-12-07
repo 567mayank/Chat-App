@@ -1,4 +1,4 @@
-export const db =  "http://localhost:3000"
+export const db =  "https://chat-app-yok3.onrender.com"
 
 export const isLoggedIn = () => {
   const local = sessionStorage.getItem("user")
