@@ -65,8 +65,12 @@ const login = async(req,res) => {
     const token = user.generateToken()
 
     const options = {
-      httpOnly : true
-    }
+      httpOnly: true,  
+      secure: process.env.NODE_ENV === 'production',  
+      sameSite: 'Strict', 
+      maxAge: 60 * 60 * 24 * 7 * 1000, 
+    };
+    
 
     return res
     .status(200)
