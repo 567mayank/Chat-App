@@ -67,7 +67,7 @@ const login = async(req,res) => {
     const options = {
       httpOnly: true,  
       secure: process.env.NODE_ENV === 'production',  
-      sameSite: 'Strict', 
+      sameSite: 'none', 
       maxAge: 60 * 60 * 24 * 7 * 1000, 
     };
     
