@@ -6,7 +6,7 @@ import { db, isLoggedIn } from "./Constant";
 const SocketContext = createContext(null);
 
 export const SocketProvider = ({ children }) => {
-  const socket = useMemo(() => io("http://localhost:3000", { 
+  const socket = useMemo(() => io(`${db}`, { 
     reconnection: false,
     transports: ["websocket"],
     withCredentials: true 

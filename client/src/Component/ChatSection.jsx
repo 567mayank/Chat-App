@@ -116,8 +116,8 @@ function ChatSection({
 
   // Sending a message
   const handleSendMessage = (e) => {
-    if (!isOpen || !chatIdRef.current) return;
     e.preventDefault();
+    if (!isOpen || !chatIdRef.current || !messageInput) return;
 
     const msg = {
       msg: messageInput,
