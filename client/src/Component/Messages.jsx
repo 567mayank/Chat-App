@@ -1,14 +1,25 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const ChatMessages = ({ messages, user }) => {
   const messagesEndRef = useRef(null);
+  const unreadMsgEndRef = useRef(null);
+  const mainMsgEndRef = useRef(null);
+  const isFirstRender = useRef(true); 
 
-  // Scroller
+  // Scroll to the right place (either unread messages or bottom)
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    // On initial render, check if there are unread messages
+    if (isFirstRender.current) {
+      isFirstRender.current = false; 
+      if (unreadMsgEndRef.current) {
+        unreadMsgEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages]); 
 
   // Time/date formatter
   const formatTimeOrDate = (createdAt) => {
@@ -25,7 +36,7 @@ const ChatMessages = ({ messages, user }) => {
     }
   };
 
-  
+  // Find index of the first unread message
   const insertIndex = messages && messages.findIndex(item => item.status === "Sent" && item.reciever === user?._id);
 
   return (
@@ -33,16 +44,17 @@ const ChatMessages = ({ messages, user }) => {
       {messages &&
         messages.map((msg, index) => (
           <div key={index}>
+            {/* Display unread message section */}
             {index === insertIndex && (
-              <div className="flex justify-center my-4" ref={messagesEndRef}>
+              <div className="flex justify-center my-4" ref={unreadMsgEndRef}>
                 <div className="px-4 py-2 bg-gray-100 rounded-full shadow-md inline-block">
                   <span className="text-xs text-gray-600">Unread Messages</span>
                 </div>
               </div>
             )}
 
+            {/* Message */}
             <div className={`flex ${msg.sender === user?._id ? 'justify-end' : 'justify-start'}`}>
-              {/* message */}
               <div
                 className={`px-4 py-2 min-w-24 max-w-xs lg:max-w-md flex flex-col rounded-lg ${
                   msg.sender === user?._id ? 'bg-[#e782b5] text-white items-end' : 'bg-gray-300 text-gray-800'
@@ -51,8 +63,7 @@ const ChatMessages = ({ messages, user }) => {
                 {msg.msg}
                 <div className="text-xs text-zinc-500 mt-1 flex items-center justify-between w-full">
                   <span>{formatTimeOrDate(msg.createdAt)}</span>
-
-                  {msg.sender === user?._id  && (
+                  {msg.sender === user?._id && (
                     <span className="ml-2 text-sm font-semibold">{msg.status}</span>
                   )}
                 </div>
@@ -61,6 +72,7 @@ const ChatMessages = ({ messages, user }) => {
           </div>
         ))}
 
+      {/* This empty div is to keep the scroll at the bottom */}
       <div ref={messagesEndRef} />
     </div>
   );

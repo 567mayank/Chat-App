@@ -20,8 +20,13 @@ function Register() {
     e.preventDefault();
 
     if (!name || !email || !username || !password) {
-      alert("All Fields Required");
+      setNotification("All Fields Required");
       return;
+    }
+
+    if(password.length < 6) {
+      setNotification("Password Should contain atleast 6 characters")
+      return
     }
 
     const formData = new FormData();
