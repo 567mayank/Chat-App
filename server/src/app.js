@@ -24,6 +24,10 @@ app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
 
+app.get('/keep-alive', (req, res) => {
+  res.status(200).send('OK');
+});
+
 const server = createServer(app);
 
 setupSocketIO(server);

@@ -6,7 +6,8 @@ import Loading from "./Loading";
 
 const CenterForm = ({
   message = "",
-  setDialog
+  setDialog,
+  setNotification
 }) => {
 
   const [username, setUsername] = useState("");
@@ -28,12 +29,14 @@ const CenterForm = ({
         {withCredentials : true}
       )
       setIsLoading(false)
-      alert("Friend Added Successfully")
-      setDialog(false)
+      setNotification("Friend Added Successfully")
+      
       window.location.reload();
     } catch (error) {
-      alert(error.response.data.Message)
+      setNotification(error.response.data.Message.toUpperCase())
       console.error("error in adding friend",error)
+    } finally {
+      setDialog(false)
     }
     
   };

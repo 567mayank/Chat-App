@@ -7,6 +7,7 @@ import { IoLogOut } from "react-icons/io5";
 import axios from 'axios';
 import { db } from '../Constant';
 import Loading from './Loading';
+import Notification from './Notification';
 
 function Contact({
   data=null,
@@ -18,6 +19,7 @@ function Contact({
   const [dialog,setDialog] = useState(false)
   const {user} = useSocketUser()
   const [isLoading,setIsLoading] = useState(false)
+  const [notification,setNotification] = useState("")
   const handleNewChat = () => {
     setDialog(true)
   }
@@ -55,10 +57,16 @@ function Contact({
     }
   }
 
+  const handleNotification = () => {
+    setNotification("")
+  }
+
   return (
     <div className="h-screen bg-[#3B1C32]">
       {/* Header */}
       {isLoading && <Loading/>}
+      {notification && <Notification message={notification} onClose={handleNotification}/>}
+
       <div className="bg-[#1A1A1D] p-4 flex items-center justify-between text-white">
         <div className="flex items-center gap-x-2 space-x-2">
           <img
@@ -104,7 +112,7 @@ function Contact({
         </div>
       </div>
 
-      {dialog && <UsernameAsk setDialog={setDialog}/>}
+      {dialog && <UsernameAsk setNotification={setNotification} setDialog={setDialog}/>}
 
     </div>
   );

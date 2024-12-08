@@ -25,7 +25,6 @@ function App() {
           }
         );
         setChat(response.data.conversations);
-        console.log(response.data)
       } catch (error) {
         console.error('Error in fetching Chats', error);
       } finally {

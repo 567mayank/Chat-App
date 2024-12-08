@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { db, isLoggedIn } from '../Constant';
 import Loading from '../Component/Loading';
+import Notification from '../Component/Notification';
 
 function Register() {
   
@@ -12,6 +13,7 @@ function Register() {
   const [password, setPassword] = useState("");  
   const [profilePic, setProfilePic] = useState(null);  
   const [isLoading,setIsLoading] = useState(false)
+  const [notification,setNotification] = useState("")
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -42,8 +44,12 @@ function Register() {
         }
       );
 
+      setNotification("User Registered Successfully")
       navigate("/login");
     } catch (error) {
+      console.log("hello")
+      if(error?.response?.data?.message) setNotification(error.response.data.message)
+      else setNotification("Unexpected Error")
       console.error("Error in registering user", error);
     } finally {
       setIsLoading(false)
@@ -66,6 +72,7 @@ function Register() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-[#392a35]">
       {isLoading && <Loading/>}
+      {notification && <Notification message={notification} onClose={()=>setNotification("")}/>}
       <div className="bg-[#fcd4dc] p-8 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Create Account</h2>
         <form onSubmit={handleSubmit}>

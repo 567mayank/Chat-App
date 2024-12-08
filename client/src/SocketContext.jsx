@@ -14,21 +14,15 @@ export const SocketProvider = ({ children }) => {
 
   const [user,setUser] = useState(null)
 
-  const connectSocket = () => {
-    
-  }
-
   useEffect(() => {
     if(!isLoggedIn()) return
     socket.on("connect", async() => {
-      console.log("connect")
       try {
         const response = await axios.put(
           `${db}/user/updateSocketId`,
           {socketId : socket.id},
           {withCredentials : true}
         )
-        console.log(response.data)
       } catch (error) {
         console.error("error in updating socketId",error)
       }
