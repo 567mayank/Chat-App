@@ -10,7 +10,7 @@ const Notification = ({ message = "Hello", onClose }) => {
 
   return (
     <div
-      className={`fixed top-4 right-4 max-w-xs md:max-w-lg w-full p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform bg-white`}
+      className={`fixed top-4 right-4 max-w-xs md:max-w-lg w-full p-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform bg-white z-50`}
     >
       <div className="flex justify-between items-center">
         <span className="text-sm font-semibold text-pink-600">{message}</span>
