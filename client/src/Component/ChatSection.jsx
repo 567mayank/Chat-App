@@ -127,7 +127,7 @@ function ChatSection() {
       {isOpen ? (
         <div className="flex flex-col h-screen bg-[#392a35]">
           {/* Heading (User's Name and Photo) */}
-          <div className="bg-[#1A1A1D] text-white p-4 flex items-center space-x-3 border-b border-zinc-500">
+          <div className="bg-[#1A1A1D] text-white p-4 flex items-center space-x-3 border-b border-zinc-500 sm:absolute md:static w-full">
             <button className="text-white hover:text-gray-400 mr-4" onClick={() => dispatch(toggleChatIsOpen())}>
               <FaArrowLeft size={20} />
             </button>
