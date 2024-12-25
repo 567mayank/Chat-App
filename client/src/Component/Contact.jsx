@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import {useNavigate} from 'react-router-dom'
-import UsernameAsk from "../Component/UsernameAsk"
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import UsernameAsk from "../Component/UsernameAsk";
 import ContactProfile from './ContactProfile';
 import { useSocketUser } from '../SocketContext';
 import { IoLogOut } from "react-icons/io5";
@@ -8,64 +8,63 @@ import axios from 'axios';
 import { db } from '../Constant';
 import Loading from './Loading';
 import Notification from './Notification';
+import { useSelector } from 'react-redux';
 
-function Contact({
-  data=null,
-  setChatSecOpen,
-  setChatUser,
-  setData
-}) {
-  const navigate = useNavigate()
-  const [dialog,setDialog] = useState(false)
-  const {user} = useSocketUser()
-  const [isLoading,setIsLoading] = useState(false)
-  const [notification,setNotification] = useState("")
+function Contact() {
+  const navigate = useNavigate();
+  const [dialog, setDialog] = useState(false);
+  const { user } = useSocketUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [filteredContacts, setFilteredContacts] = useState([]); 
+  const contacts = useSelector((state) => state.chat.contacts)[0];
+
   const handleNewChat = () => {
-    setDialog(true)
+    setDialog(true);
   }
 
   const handleNewGroup = () => {
-
+    // new group functionality
   }
 
-  const handleContactClick = (contact,chatId) => {
-    setChatSecOpen(true)
-    setChatUser(contact)
-    setData(prevConversations =>
-      prevConversations.map(conversation =>
-        conversation._id === chatId
-          ? { ...conversation, unreadCount: 0 } 
-          : conversation 
-      )
-    );
-  }
-
-  const handleLogout = async() => {
-    sessionStorage.clear()
+  const handleLogout = async () => {
+    sessionStorage.clear();
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await axios.post(
         `${db}/user/logout`,
         {},
-        {withCredentials : true}
-      ) 
-      navigate('/')
+        { withCredentials: true }
+      );
+      navigate('/');
     } catch (error) {
-      console.error("Error in logging out user",error)
+      console.error("Error in logging out user", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const handleNotification = () => {
-    setNotification("")
+    setNotification("");
   }
+
+  // search function
+  useEffect(() => {
+    if (contacts) {
+      const filtered = contacts.filter((contact) =>
+        contact?.participants[0]?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact?.participants[0]?.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredContacts(filtered);
+    }
+  }, [searchQuery, contacts]);
 
   return (
     <div className="h-screen bg-[#3B1C32]">
       {/* Header */}
-      {isLoading && <Loading/>}
-      {notification && <Notification message={notification} onClose={handleNotification}/>}
+      {isLoading && <Loading />}
+      {notification && <Notification message={notification} onClose={handleNotification} />}
 
       <div className="bg-[#1A1A1D] p-4 flex items-center justify-between text-white">
         <div className="flex items-center gap-x-2 space-x-2">
@@ -89,6 +88,8 @@ function Contact({
         <input
           type="text"
           placeholder="Search"
+          value={searchQuery} // Controlled input
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query
           className=" w-full flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#643954] focus:border-[#643954]"
         />
         <div className='flex w-full gap-x-2'>
@@ -104,16 +105,17 @@ function Contact({
       {/* Chat/People List */}
       <div className="overflow-auto p-4">
         <div className="space-y-3">
-          {
-            data && data.map((chat,index) => (
-              <ContactProfile key={index} data={chat.participants[0]} chat={chat} unreadCount={chat?.unreadCount} handleContactClick={handleContactClick} />
+          {filteredContacts && filteredContacts.length > 0 ? (
+            filteredContacts.map((chat, index) => (
+              <ContactProfile key={index} data={chat.participants[0]} chat={chat} unreadCount={chat?.unreadCount} />
             ))
-          }
+          ) : (
+            <div className="text-white text-center border p-2 rounded-md">No contacts found</div>
+          )}
         </div>
       </div>
 
-      {dialog && <UsernameAsk setNotification={setNotification} setDialog={setDialog}/>}
-
+      {dialog && <UsernameAsk setNotification={setNotification} setDialog={setDialog} />}
     </div>
   );
 }

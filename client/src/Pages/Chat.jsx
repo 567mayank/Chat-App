@@ -5,39 +5,44 @@ import { db, isLoggedIn } from '../Constant';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../Component/Loading';
+import { useSelector, useDispatch } from 'react-redux'
+import { addContacts } from '../Redux/chatSlice';
 
 function App() {
-  const [isLoading,setIsLoading] = useState(false)
+  const dispatch = useDispatch()
   const navigate = useNavigate() 
-  const [chatSecOpen, setChatSecOpen] = useState(false);
-  const [chatUser, setChatUser] = useState(null);
-  const [chat, setChat] = useState(null);
+
+  const [isLoading,setIsLoading] = useState(false)
+  
+  const chatSecOpen = useSelector((state) => state.msg.chatIsOpen)
+
+  const chatRedux = useSelector((state) => state.chat.contacts) 
+  
+
+
+  // fetching contacts
+  const retrieveData = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${db}/chat/allUserChat`,
+        {
+          withCredentials: true,
+        }
+      );
+      dispatch(addContacts(response.data.conversations))
+    } catch (error) {
+      console.error('Error in fetching Chats', error);
+    } finally {
+      setIsLoading(false)
+    }
+  };
 
   useEffect(() => {
-    if(!isLoggedIn()) return
-    const retrieveData = async () => {
-      try {
-        setIsLoading(true)
-        const response = await axios.get(
-          `${db}/chat/allUserChat`,
-          {
-            withCredentials: true,
-          }
-        );
-        setChat(response.data.conversations);
-      } catch (error) {
-        console.error('Error in fetching Chats', error);
-      } finally {
-        setIsLoading(false)
-      }
-    };
+    if (chatRedux.length === 0) 
+      retrieveData()
+  }, [chatRedux, dispatch])
 
-    retrieveData();
-  }, []);
-
-  useEffect(()=>{
-    if(!chatSecOpen) setChatUser(null)
-  },[chatSecOpen])
 
   useEffect(()=>{
     if(!isLoggedIn()) {
@@ -55,7 +60,7 @@ function App() {
           chatSecOpen ? 'hidden' : 'block'
         } lg:block`}
       >
-        <Contact data={chat} setChatSecOpen={setChatSecOpen} setChatUser={setChatUser} setData={setChat} />
+        <Contact/>
       </div>
 
       <div
@@ -63,7 +68,7 @@ function App() {
           chatSecOpen ? 'block' : 'hidden'
         } lg:block`}
       >
-        <ChatSection setChatSecOpen={setChatSecOpen} isOpen={chatSecOpen} reciever={chatUser} setData={setChat} />
+        <ChatSection/>
       </div>
     </div>
   );

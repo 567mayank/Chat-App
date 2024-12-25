@@ -1,13 +1,24 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { removeNotification } from '../Redux/chatSlice'
+import { updateChatUser, toggleChatIsOpen } from '../Redux/msgSlice'
 
 function ContactProfile({
   data=null,
-  handleContactClick,
   unreadCount = 0,
   chat
-}) {
+}) 
+{
+  const dispatch = useDispatch()
+  
+  const handleClick = () => {
+    dispatch(removeNotification(chat._id))
+    dispatch(updateChatUser(data))
+    dispatch(toggleChatIsOpen())
+  }
+
   return (
-    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors" onClick={()=>handleContactClick(data,chat._id)}>
+    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:bg-gray-50 cursor-pointer transition-colors" onClick={handleClick}>
       <img
         src={data?.avatar}
         alt="User"

@@ -5,17 +5,20 @@ import { FaArrowLeft } from "react-icons/fa";
 import { db, isLoggedIn } from '../Constant';
 import { useSocketUser } from '../SocketContext';
 import Messages from './Messages';
+import { useSelector, useDispatch } from 'react-redux';
+import { addNotification } from '../Redux/chatSlice';
+import { toggleChatIsOpen } from '../Redux/msgSlice';
 
-function ChatSection({
-  isOpen,
-  setChatSecOpen = false,
-  reciever,
-  setData
-}) {
+function ChatSection() {
+  const dispatch = useDispatch()
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState(null);
   const { socket, user } = useSocketUser();
   const chatIdRef = useRef(null);
+  const reciever = useSelector((state) => state.msg.chatUser)
+  const isOpen = useSelector((state) => state.msg.chatIsOpen)
+
+  // console.log(open)
 
   // isOpen false 
   useEffect(() => {
@@ -29,7 +32,7 @@ function ChatSection({
   useEffect(()=>{
     if(isOpen ) return
     socket.on("msg-backend",(msg) => {
-      addCountWhenChatIsOff(msg)
+      dispatch(addNotification(msg.msg.conversationId))  // for adding count in redux when chat is unopened 
     })
 
     return () => {
@@ -37,20 +40,6 @@ function ChatSection({
     };
 
   },[isOpen])
-
-  // add count
-  const addCountWhenChatIsOff = (msg) => {
-    setData(prevConversations =>
-      prevConversations.map(conversation =>
-        conversation._id === msg.msg.conversationId
-        ? {
-            ...conversation,
-            unreadCount: (conversation.unreadCount || 0) + 1,
-          }
-        : conversation
-      )
-    );
-  }
 
   // fetching messages
   useEffect(() => {
@@ -138,14 +127,14 @@ function ChatSection({
       {isOpen ? (
         <div className="flex flex-col h-screen bg-[#392a35]">
           {/* Heading (User's Name and Photo) */}
-          <div className="bg-[#1A1A1D] text-white p-4 flex items-center space-x-3">
-            <button className="text-white hover:text-gray-400 mr-4" onClick={() => setChatSecOpen(false)}>
+          <div className="bg-[#1A1A1D] text-white p-4 flex items-center space-x-3 border-b border-zinc-500">
+            <button className="text-white hover:text-gray-400 mr-4" onClick={() => dispatch(toggleChatIsOpen())}>
               <FaArrowLeft size={20} />
             </button>
             <img
               src={reciever?.avatar}
               alt={reciever?.username}
-              className="rounded-full w-10 h-10 object-cover"
+              className="rounded-full w-12 h-11 object-cover"
             />
             <h3 className="text-lg font-semibold">{reciever?.name}</h3>
           </div>
